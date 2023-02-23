@@ -4,7 +4,16 @@ import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
+/**
+ * MyApp class responsible for sets up the whole app.
+ * - creates app-wide state
+ * - names the app
+ * - defines visual theme
+ * - sets the "home" widget
+ */
 class MyApp extends StatelessWidget {
+
+  // build() automatically called everytime the widget's circumstances change
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -21,20 +30,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/**
+ * MyAppState defines the app's state.
+ * It extends ChangeNotifier, a class that able to notify others about its own changes.
+ */
 class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-  var favs = <WordPair>[];
+  var currentWord = WordPair.random();
+  var favWords = <WordPair>[];
 
   void getNext() {
-    current = WordPair.random();
+    currentWord = WordPair.random();
     notifyListeners();
   }
 
   void toggleFav() {
-    if (favs.contains(current)) {
-      favs.remove(current);
+    if (favWords.contains(currentWord)) {
+      favWords.remove(currentWord);
     } else {
-      favs.add(current);
+      favWords.add(currentWord);
     }
     notifyListeners();
   }
@@ -67,24 +80,24 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           SafeArea(
               child: NavigationRail(
-            destinations: [
-              NavigationRailDestination(
-                  icon: Icon(Icons.home), label: Text('Home')),
-              NavigationRailDestination(
-                  icon: Icon(Icons.favorite), label: Text('Favorites'))
-            ],
-            selectedIndex: selectedIndex,
-            onDestinationSelected: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-            },
-          )),
+                destinations: [
+                  NavigationRailDestination(
+                      icon: Icon(Icons.home), label: Text('Home')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.favorite), label: Text('Favorites'))
+                ],
+                selectedIndex: selectedIndex,
+                onDestinationSelected: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
+              )),
           Expanded(
               child: Container(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: page,
-          ))
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: page,
+              ))
         ],
       ),
     );
@@ -113,10 +126,10 @@ class GeneratorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+    var pair = appState.currentWord;
 
     IconData icon;
-    if (appState.favs.contains(pair)) {
+    if (appState.favWords.contains(pair)) {
       icon = Icons.favorite;
     } else {
       icon = Icons.favorite_border;
@@ -125,26 +138,26 @@ class GeneratorPage extends StatelessWidget {
     return Scaffold(
       body: Center(
           child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          BigCard(pair: pair),
-          SizedBox(height: 10),
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            ElevatedButton.icon(
-                onPressed: () {
-                  appState.toggleFav();
-                },
-                icon: Icon(icon),
-                label: Text('Like')),
-            SizedBox(width: 4),
-            ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                child: Text('Next'))
-          ])
-        ],
-      )),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              BigCard(pair: pair),
+              SizedBox(height: 10),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                ElevatedButton.icon(
+                    onPressed: () {
+                      appState.toggleFav();
+                    },
+                    icon: Icon(icon),
+                    label: Text('Like')),
+                SizedBox(width: 4),
+                ElevatedButton(
+                    onPressed: () {
+                      appState.getNext();
+                    },
+                    child: Text('Next'))
+              ])
+            ],
+          )),
     );
   }
 }
