@@ -1,41 +1,150 @@
+import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // Application name
-      title: 'Flutter Hello World',
-      // Application theme data, you can set the colors for the application as
-      // you want
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+        title: 'Namer App',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        ),
+        home: MyHomePage(),
       ),
-      // A widget which will be started on application startup
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  final String title;
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+class MyAppState extends ChangeNotifier {
+  var current = WordPair.random();
+  var favs = <WordPair>[];
+
+  void getNext() {
+    current = WordPair.random();
+    notifyListeners();
+  }
+
+  void toggleFav() {
+    if (favs.contains(current)) {
+      favs.remove(current);
+    } else {
+      favs.add(current);
+    }
+    notifyListeners();
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = Placeholder();
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        // The title text which will be shown on the action bar
-        title: Text(title),
+      body: Row(
+        children: [
+          SafeArea(
+              child: NavigationRail(
+            destinations: [
+              NavigationRailDestination(
+                  icon: Icon(Icons.home), label: Text('Home')),
+              NavigationRailDestination(
+                  icon: Icon(Icons.favorite), label: Text('Favorites'))
+            ],
+            selectedIndex: selectedIndex,
+            onDestinationSelected: (value) {
+              setState(() {
+                selectedIndex = value;
+              });
+            },
+          )),
+          Expanded(
+              child: Container(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: page,
+          ))
+        ],
       ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  final WordPair pair;
+
+  const BigCard({Key? key, required this.pair}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    var textStyle = theme.textTheme.displayMedium!
+        .copyWith(color: theme.colorScheme.onPrimary);
+    return Card(
+        color: theme.colorScheme.primary,
+        child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(pair.asLowerCase, style: textStyle)));
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var pair = appState.current;
+
+    IconData icon;
+    if (appState.favs.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
+    return Scaffold(
       body: Center(
-        child: Text(
-          'Hello, World!',
-        ),
-      ),
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(height: 10),
+          Row(mainAxisSize: MainAxisSize.min, children: [
+            ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFav();
+                },
+                icon: Icon(icon),
+                label: Text('Like')),
+            SizedBox(width: 4),
+            ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'))
+          ])
+        ],
+      )),
     );
   }
 }
