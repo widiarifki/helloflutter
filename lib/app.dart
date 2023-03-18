@@ -1,17 +1,15 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:helloworld/appcontent.dart';
+import 'package:helloworld/appcontainer.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(App());
 
-/**
- * `App` class is responsible to sets up the whole app:
- * - names the app
- * - creates app-wide state, support by ChangeNotifierProvider
- * - defines visual theme
- * - sets 'home' widget
- */
+/// `App` class is responsible to sets up the whole app:
+/// - names the app
+/// - creates app-wide state, support by ChangeNotifierProvider
+/// - defines visual theme
+/// - sets 'home' widget
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,7 +17,7 @@ class App extends StatelessWidget {
       create: (context) => AppGlobalState(),
       child: MaterialApp(
           title: "Namer App",
-          home: AppContent(),
+          home: AppContainer(),
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),

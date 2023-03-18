@@ -3,12 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:helloworld/favepage.dart';
 import 'package:helloworld/homepage.dart';
 
-class AppContent extends StatefulWidget {
+class AppContainer extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _AppContentState();
+  State<StatefulWidget> createState() => _AppContainerState();
 }
 
-class _AppContentState extends State<AppContent> {
+class _AppContainerState extends State<AppContainer> {
   int selectedMenuIndex = 0;
 
   @override
